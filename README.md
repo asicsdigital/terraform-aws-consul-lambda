@@ -15,8 +15,6 @@ This module
 - `env`     - env to deploy in, i.e dev/staging/prod
 - `subnets` - List of VPC Subnets IDs used to do lambdas
 - `rds_sg`  - List of Security Groups ID's to use for consulRdsCreateService lambda
-- `vpc_id`  - VPC ID
-
 
 #### Optional
 

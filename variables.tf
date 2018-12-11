@@ -15,5 +15,3 @@ variable "rds_vpc_ids" {
   default     = []
   description = "List of VPC ID's the consulRdsCreateService lambda will attempt to discover RDS instances in. Defaults empty array"
 }
-
-variable "vpc_id" {}
