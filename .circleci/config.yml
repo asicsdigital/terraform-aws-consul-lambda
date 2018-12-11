@@ -1,27 +1,43 @@
+---
+# Anchors for aliases
+docker_terraform: &docker_terraform
+  working_directory: ~/terraform
+  docker:
+    - image: asicsdigital/hermes:terraform-0.11.8
+      entrypoint: /bin/sh
+
+terraform_fmt: &terraform_fmt
+  name: terraform-fmt
+  command: terraform fmt -write=false -list=true -diff=true
+
+terraform_init: &terraform_init
+  name: terraform-init
+  command: terraform init -input=false -lock-timeout=120s
+
+terraform_validate: &terraform_validate
+  name: terraform-validate
+  command: terraform validate -check-variables=false
+
 version: 2
 
 jobs:
   build:
-    docker:
-      - image: hashicorp/terraform:0.10.6
-        entrypoint: /bin/sh
+    <<: *docker_terraform
     steps:
       - checkout
       - run:
-          name: validate tf files (terraform validate)
-          command: find . -type f -name "*.tf" -exec dirname {} \;|sort -u | while read m; do (terraform validate -check-variables=false "$m" && echo "√ $m") || exit 1 ; done
+          <<: *terraform_validate
       - run:
-          name: check if all tf files are formatted (terraform fmt)
-          command: if [ `terraform fmt | wc -c` -ne 0 ]; then echo "Some terraform files need be formatted, run 'terraform fmt' to fix"; exit 1; fi
-      - run:
-          name: "get tflint"
-          command: apk add wget ; wget https://github.com/wata727/tflint/releases/download/v0.4.2/tflint_linux_amd64.zip ; unzip tflint_linux_amd64.zip
-      - run:
-          name: "install tflint"
-          command: mkdir -p /usr/local/tflint/bin ; export PATH=/usr/local/tflint/bin:$PATH ; install tflint /usr/local/tflint/bin
-      - run:
-          name: "tflint check"
-          command: /usr/local/tflint/bin/tflint
+          <<: *terraform_fmt
+#      - run:
+#          name: "get tflint"
+#          command: apk add wget ; wget https://github.com/wata727/tflint/releases/download/v0.4.2/tflint_linux_amd64.zip ; unzip tflint_linux_amd64.zip
+#      - run:
+#          name: "install tflint"
+#          command: mkdir -p /usr/local/tflint/bin ; export PATH=/usr/local/tflint/bin:$PATH ; install tflint /usr/local/tflint/bin
+#      - run:
+#          name: "tflint check"
+#          command: /usr/local/tflint/bin/tflint
 workflows:
   version: 2
   build:
