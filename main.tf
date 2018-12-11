@@ -1,4 +1,3 @@
-
 data "template_file" "json_config" {
   vars {
     rds_vpc_ids = "${jsonencode(var.rds_vpc_ids)}"
