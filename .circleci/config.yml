@@ -28,6 +28,8 @@ jobs:
     steps:
       - checkout
       - run:
+          <<: *terraform_init
+      - run:
           <<: *terraform_validate
       - run:
           <<: *terraform_fmt
