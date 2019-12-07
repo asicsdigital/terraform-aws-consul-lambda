@@ -16,12 +16,14 @@ terraform_init: &terraform_init
 
 terraform_validate: &terraform_validate
   name: terraform-validate
-  command: terraform validate -check-variables=false
+  command: terraform validate
 
 version: 2
 
 jobs:
   build:
+    environment:
+      AWS_DEFAULT_REGION: us-east-1
     <<: *docker_terraform
     steps:
       - checkout
