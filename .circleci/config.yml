@@ -3,7 +3,7 @@
 docker_terraform: &docker_terraform
   working_directory: ~/terraform
   docker:
-    - image: asicsdigital/hermes:terraform-0.11.7
+    - image: asicsdigital/hermes:terraform-0.12.8
       entrypoint: /bin/sh
 
 terraform_fmt: &terraform_fmt
@@ -16,15 +16,19 @@ terraform_init: &terraform_init
 
 terraform_validate: &terraform_validate
   name: terraform-validate
-  command: terraform validate -check-variables=false
+  command: terraform validate
 
 version: 2
 
 jobs:
   build:
+    environment:
+      AWS_DEFAULT_REGION: us-east-1
     <<: *docker_terraform
     steps:
       - checkout
+      - run:
+          <<: *terraform_init
       - run:
           <<: *terraform_validate
       - run:

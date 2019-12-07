@@ -6,7 +6,12 @@ data "template_file" "json_config" {
   template = <<INPUT
 { "detail": {"vpc_ids": $${rds_vpc_ids} }}
 INPUT
+}
 
+data "null_data_source" "lambda_file" {
+  inputs = {
+    filename = "${substr("${path.module}/files/rds/consulRdsCreateService.zip", length(path.cwd) + 1, -1)}"
+  }
 }
 
 resource "aws_iam_role" "consul_rds" {
@@ -63,11 +68,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_exec" {
 }
 
 resource "aws_lambda_function" "consulRdsCreateService" {
-  filename         = "${path.module}/files/rds/consulRdsCreateService.zip"
-  function_name    = "consulRdsCreateService-${var.env}" # env var
+  filename         = data.null_data_source.lambda_file.outputs.filename
+  function_name    = "consulRdsCreateService-${var.env}"
   role             = aws_iam_role.consul_rds.arn
   handler          = "consulRdsCreateService.lambda_handler"
-  source_code_hash = filebase64sha256("${path.module}/files/rds/consulRdsCreateService.zip")
+  source_code_hash = filebase64sha256(data.null_data_source.lambda_file.outputs.filename)
   runtime          = "python2.7"
   timeout          = "60"
 
